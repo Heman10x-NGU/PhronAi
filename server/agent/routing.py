@@ -1,0 +1,12 @@
+"""
+PHRONAI WebSocket Routing
+
+Routes WebSocket connections to the appropriate consumers.
+"""
+
+from django.urls import re_path
+from . import consumers
+
+websocket_urlpatterns = [
+    re_path(r"ws/agent/$", consumers.AgentConsumer.as_asgi()),
+]
