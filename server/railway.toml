@@ -1,0 +1,21 @@
+# Railway Configuration for PHRONAI
+# This file tells Railway how to build and deploy the application
+
+[build]
+builder = "dockerfile"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+healthcheckPath = "/health/"
+healthcheckTimeout = 300
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 3
+
+# Environment variables (set in Railway dashboard, not here)
+# Required:
+# - DEEPGRAM_API_KEY
+# - GROQ_API_KEY  
+# - DATABASE_URL (auto-provided by Railway PostgreSQL)
+# - REDIS_URL (auto-provided by Railway Redis)
+# - DJANGO_SECRET_KEY
+# - ALLOWED_HOSTS (set to your Railway domain)
