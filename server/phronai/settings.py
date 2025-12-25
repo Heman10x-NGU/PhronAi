@@ -70,16 +70,25 @@ TEMPLATES = [
 ASGI_APPLICATION = "phronai.asgi.application"
 
 # Channel Layers (Redis for production, in-memory for dev)
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [(os.getenv("REDIS_HOST", "localhost"), 6379)],
-        },
-    } if os.getenv("REDIS_HOST") else {
-        "BACKEND": "channels.layers.InMemoryChannelLayer"
+# Supports Upstash Redis URL format: rediss://default:password@host:port
+REDIS_URL = os.getenv("REDIS_URL")
+
+if REDIS_URL:
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels_redis.core.RedisChannelLayer",
+            "CONFIG": {
+                "hosts": [REDIS_URL],
+            },
+        }
     }
-}
+else:
+    # Fallback to in-memory for local development
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels.layers.InMemoryChannelLayer"
+        }
+    }
 
 # Database
 DATABASES = {
