@@ -129,193 +129,8 @@ export class DiagramNodeUtil extends BaseBoxShapeUtil<DiagramNodeShape> {
   };
 
   component(shape: DiagramNodeShape) {
-    const { w, h, color, nodeType, label, description } = shape.props;
-    const icon = ICONS[nodeType] || ICONS.circle;
-    const effectiveColor = color || NODE_COLORS[nodeType] || 'grey';
-    const bgColor = getColorHex(effectiveColor);
-
-    const isEditing = this.editor.getEditingShapeId() === shape.id;
-
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    const [editingLabel, setEditingLabel] = useState(label);
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    const [editingDescription, setEditingDescription] = useState(description);
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    const labelInputRef = useRef<HTMLInputElement>(null);
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    const descriptionInputRef = useRef<HTMLInputElement>(null);
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    const wasEditingRef = useRef(false);
-
-    // Focus label input and sync state when entering edit mode
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    useEffect(() => {
-      const wasEditing = wasEditingRef.current;
-      wasEditingRef.current = isEditing;
-
-      // Sync state when entering edit mode (including first render if already editing)
-      if (isEditing && !wasEditing) {
-        setEditingLabel(label);
-        setEditingDescription(description);
-
-        if (labelInputRef.current) {
-          labelInputRef.current.focus();
-          labelInputRef.current.select();
-        }
-      }
-    }, [isEditing, label, description]);
-
-    const saveChanges = () => {
-      this.editor.updateShape({
-        id: shape.id,
-        type: 'diagram-node',
-        props: {
-          label: editingLabel || 'Node',
-          description: editingDescription,
-        },
-      });
-      this.editor.setEditingShape(null);
-    };
-
-    const handleBlur = (e: React.FocusEvent) => {
-      // Check if focus is moving to the other input field
-      const relatedTarget = e.relatedTarget as HTMLElement;
-      if (
-        relatedTarget === labelInputRef.current ||
-        relatedTarget === descriptionInputRef.current
-      ) {
-        // Focus is moving between our inputs, don't exit edit mode
-        return;
-      }
-      // Focus is leaving the shape entirely, save and exit
-      saveChanges();
-    };
-
-    const handleKeyDown = (e: React.KeyboardEvent) => {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        saveChanges();
-      } else if (e.key === 'Escape') {
-        setEditingLabel(label);
-        setEditingDescription(description);
-        this.editor.setEditingShape(null);
-      }
-    };
-
-    return (
-      <HTMLContainer
-        id={shape.id}
-        onPointerDown={isEditing ? this.editor.markEventAsHandled : undefined}
-        style={{
-          width: w,
-          height: h,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: bgColor,
-          border: `2px solid var(--color-${effectiveColor}-text)`,
-          borderRadius: '8px',
-          padding: '12px',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-          pointerEvents: isEditing ? 'all' : 'none',
-        }}
-      >
-        {/* Icon */}
-        <div
-          style={{
-            width: '32px',
-            height: '32px',
-            marginBottom: '8px',
-            color: `var(--color-${effectiveColor}-text)`,
-          }}
-          dangerouslySetInnerHTML={{ __html: icon }}
-        />
-
-        {/* Label */}
-        {isEditing ? (
-          <input
-            ref={labelInputRef}
-            type="text"
-            value={editingLabel}
-            onChange={(e) => setEditingLabel(e.target.value)}
-            onKeyDown={handleKeyDown}
-            onBlur={handleBlur}
-            style={{
-              fontSize: '14px',
-              fontWeight: '600',
-              color: `var(--color-${effectiveColor}-text)`,
-              textAlign: 'center',
-              marginBottom: '4px',
-              lineHeight: '1.2',
-              maxWidth: '100%',
-              width: '90%',
-              background: 'rgba(255, 255, 255, 0.9)',
-              border: '1px solid var(--color-text)',
-              borderRadius: '4px',
-              padding: '4px',
-            }}
-            placeholder="Label"
-          />
-        ) : (
-          <div
-            style={{
-              fontSize: '14px',
-              fontWeight: '600',
-              color: `var(--color-${effectiveColor}-text)`,
-              textAlign: 'center',
-              marginBottom: description ? '4px' : '0',
-              lineHeight: '1.2',
-              wordBreak: 'break-word',
-              maxWidth: '100%',
-            }}
-          >
-            {label}
-          </div>
-        )}
-
-        {/* Description */}
-        {isEditing ? (
-          <input
-            ref={descriptionInputRef}
-            type="text"
-            value={editingDescription}
-            onChange={(e) => setEditingDescription(e.target.value)}
-            onKeyDown={handleKeyDown}
-            onBlur={handleBlur}
-            style={{
-              fontSize: '11px',
-              color: `var(--color-${effectiveColor}-text)`,
-              textAlign: 'center',
-              lineHeight: '1.3',
-              maxWidth: '100%',
-              width: '90%',
-              background: 'rgba(255, 255, 255, 0.9)',
-              border: '1px solid var(--color-text)',
-              borderRadius: '4px',
-              padding: '4px',
-            }}
-            placeholder="Description (optional)"
-          />
-        ) : (
-          description && (
-            <div
-              style={{
-                fontSize: '11px',
-                color: `var(--color-${effectiveColor}-text)`,
-                opacity: 0.8,
-                textAlign: 'center',
-                lineHeight: '1.3',
-                wordBreak: 'break-word',
-                maxWidth: '100%',
-              }}
-            >
-              {description}
-            </div>
-          )
-        )}
-      </HTMLContainer>
-    );
+    // Delegate to a proper functional component to use hooks correctly
+    return <DiagramNodeComponent shape={shape} editor={this.editor} />;
   }
 
   indicator(shape: DiagramNodeShape) {
@@ -330,6 +145,201 @@ export class DiagramNodeUtil extends BaseBoxShapeUtil<DiagramNodeShape> {
       },
     };
   };
+}
+
+// Proper functional component that can use hooks
+function DiagramNodeComponent({ 
+  shape, 
+  editor 
+}: { 
+  shape: DiagramNodeShape; 
+  editor: DiagramNodeUtil['editor'];
+}) {
+  const { w, h, color, nodeType, label, description } = shape.props;
+  const icon = ICONS[nodeType] || ICONS.circle;
+  const effectiveColor = color || NODE_COLORS[nodeType] || 'grey';
+  const bgColor = getColorHex(effectiveColor);
+
+  const isEditing = editor.getEditingShapeId() === shape.id;
+
+  const [editingLabel, setEditingLabel] = useState(label);
+  const [editingDescription, setEditingDescription] = useState(description);
+  const labelInputRef = useRef<HTMLInputElement>(null);
+  const descriptionInputRef = useRef<HTMLInputElement>(null);
+  const wasEditingRef = useRef(false);
+
+  // Focus label input and sync state when entering edit mode
+  useEffect(() => {
+    const wasEditing = wasEditingRef.current;
+    wasEditingRef.current = isEditing;
+
+    // Sync state when entering edit mode (including first render if already editing)
+    if (isEditing && !wasEditing) {
+      setEditingLabel(label);
+      setEditingDescription(description);
+
+      if (labelInputRef.current) {
+        labelInputRef.current.focus();
+        labelInputRef.current.select();
+      }
+    }
+  }, [isEditing, label, description]);
+
+  const saveChanges = () => {
+    editor.updateShape({
+      id: shape.id,
+      type: 'diagram-node',
+      props: {
+        label: editingLabel || 'Node',
+        description: editingDescription,
+      },
+    });
+    editor.setEditingShape(null);
+  };
+
+  const handleBlur = (e: React.FocusEvent) => {
+    // Check if focus is moving to the other input field
+    const relatedTarget = e.relatedTarget as HTMLElement;
+    if (
+      relatedTarget === labelInputRef.current ||
+      relatedTarget === descriptionInputRef.current
+    ) {
+      // Focus is moving between our inputs, don't exit edit mode
+      return;
+    }
+    // Focus is leaving the shape entirely, save and exit
+    saveChanges();
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      saveChanges();
+    } else if (e.key === 'Escape') {
+      setEditingLabel(label);
+      setEditingDescription(description);
+      editor.setEditingShape(null);
+    }
+  };
+
+  const handlePointerDown = isEditing 
+    ? (e: React.PointerEvent) => e.stopPropagation() 
+    : undefined;
+
+  return (
+    <HTMLContainer
+      id={shape.id}
+      onPointerDown={handlePointerDown}
+      style={{
+        width: w,
+        height: h,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: bgColor,
+        border: `2px solid var(--color-${effectiveColor}-text)`,
+        borderRadius: '8px',
+        padding: '12px',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+        pointerEvents: isEditing ? 'all' : 'none',
+      }}
+    >
+      {/* Icon */}
+      <div
+        style={{
+          width: '32px',
+          height: '32px',
+          marginBottom: '8px',
+          color: `var(--color-${effectiveColor}-text)`,
+        }}
+        dangerouslySetInnerHTML={{ __html: icon }}
+      />
+
+      {/* Label */}
+      {isEditing ? (
+        <input
+          ref={labelInputRef}
+          type="text"
+          value={editingLabel}
+          onChange={(e) => setEditingLabel(e.target.value)}
+          onKeyDown={handleKeyDown}
+          onBlur={handleBlur}
+          style={{
+            fontSize: '14px',
+            fontWeight: '600',
+            color: `var(--color-${effectiveColor}-text)`,
+            textAlign: 'center',
+            marginBottom: '4px',
+            lineHeight: '1.2',
+            maxWidth: '100%',
+            width: '90%',
+            background: 'rgba(255, 255, 255, 0.9)',
+            border: '1px solid var(--color-text)',
+            borderRadius: '4px',
+            padding: '4px',
+          }}
+          placeholder="Label"
+        />
+      ) : (
+        <div
+          style={{
+            fontSize: '14px',
+            fontWeight: '600',
+            color: `var(--color-${effectiveColor}-text)`,
+            textAlign: 'center',
+            marginBottom: description ? '4px' : '0',
+            lineHeight: '1.2',
+            wordBreak: 'break-word',
+            maxWidth: '100%',
+          }}
+        >
+          {label}
+        </div>
+      )}
+
+      {/* Description */}
+      {isEditing ? (
+        <input
+          ref={descriptionInputRef}
+          type="text"
+          value={editingDescription}
+          onChange={(e) => setEditingDescription(e.target.value)}
+          onKeyDown={handleKeyDown}
+          onBlur={handleBlur}
+          style={{
+            fontSize: '11px',
+            color: `var(--color-${effectiveColor}-text)`,
+            textAlign: 'center',
+            lineHeight: '1.3',
+            maxWidth: '100%',
+            width: '90%',
+            background: 'rgba(255, 255, 255, 0.9)',
+            border: '1px solid var(--color-text)',
+            borderRadius: '4px',
+            padding: '4px',
+          }}
+          placeholder="Description (optional)"
+        />
+      ) : (
+        description && (
+          <div
+            style={{
+              fontSize: '11px',
+              color: `var(--color-${effectiveColor}-text)`,
+              opacity: 0.8,
+              textAlign: 'center',
+              lineHeight: '1.3',
+              wordBreak: 'break-word',
+              maxWidth: '100%',
+            }}
+          >
+            {description}
+          </div>
+        )
+      )}
+    </HTMLContainer>
+  );
 }
 
 // Helper function to get color for node type
