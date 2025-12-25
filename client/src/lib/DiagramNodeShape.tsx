@@ -155,12 +155,20 @@ function DiagramNodeComponent({
   shape: DiagramNodeShape; 
   editor: DiagramNodeUtil['editor'];
 }) {
-  const { w, h, color, nodeType, label, description } = shape.props;
-  const icon = ICONS[nodeType] || ICONS.circle;
+  // Defensive: ensure shape.props exists
+  const props = shape?.props || { w: 200, h: 120, color: 'grey', nodeType: 'box', label: 'Node', description: '' };
+  const { w, h, color, nodeType, label, description } = props;
+  const icon = ICONS[nodeType] || ICONS.circle || ICONS.box;
   const effectiveColor = color || NODE_COLORS[nodeType] || 'grey';
   const bgColor = getColorHex(effectiveColor);
 
-  const isEditing = editor.getEditingShapeId() === shape.id;
+  // Defensive: wrap in try-catch to prevent crashes
+  let isEditing = false;
+  try {
+    isEditing = editor?.getEditingShapeId?.() === shape?.id;
+  } catch (e) {
+    console.warn('DiagramNodeComponent: Error checking editing state', e);
+  }
 
   const [editingLabel, setEditingLabel] = useState(label);
   const [editingDescription, setEditingDescription] = useState(description);
