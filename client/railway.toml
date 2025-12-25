@@ -1,0 +1,11 @@
+# ============================================
+# PHRONAI React Client - Railway Configuration
+# ============================================
+# This builds the React frontend as a static site
+
+[build]
+builder = "nixpacks"
+
+[deploy]
+healthcheckPath = "/"
+healthcheckTimeout = 100

@@ -1,8 +1,9 @@
-# PHRONAI React Frontend
-# Multi-stage build for production
+# ============================================
+# PHRONAI React Frontend - Production Dockerfile
+# ============================================
+# Optimized for Railway deployment
 
-# Stage 1: Build
-FROM node:20-alpine as builder
+FROM node:18-alpine AS builder
 
 WORKDIR /app
 
@@ -12,15 +13,26 @@ COPY package*.json ./
 # Install dependencies
 RUN npm ci
 
-# Copy source code
+# Copy source
 COPY . .
 
-# Build for production
+# Build arguments for environment variables
+ARG VITE_SUPABASE_URL
+ARG VITE_SUPABASE_ANON_KEY
+ARG VITE_API_WS_URL
+
+# Set environment for build
+ENV VITE_SUPABASE_URL=$VITE_SUPABASE_URL
+ENV VITE_SUPABASE_ANON_KEY=$VITE_SUPABASE_ANON_KEY
+ENV VITE_API_WS_URL=$VITE_API_WS_URL
+
+# Build
 RUN npm run build
 
-
-# Stage 2: Serve
-FROM nginx:alpine as production
+# ============================================
+# Production Stage - Nginx
+# ============================================
+FROM nginx:alpine
 
 # Copy built files
 COPY --from=builder /app/dist /usr/share/nginx/html
@@ -28,6 +40,8 @@ COPY --from=builder /app/dist /usr/share/nginx/html
 # Copy nginx config
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-EXPOSE 3000
+# Expose port (Railway sets PORT env var)
+EXPOSE 80
 
+# Start nginx
 CMD ["nginx", "-g", "daemon off;"]
