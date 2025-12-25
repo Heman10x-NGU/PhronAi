@@ -47,7 +47,8 @@ export function AgentCanvas() {
   useEffect(() => {
     if (!session?.access_token) return;
 
-    const wsUrl = import.meta.env.VITE_WS_URL || 'ws://localhost:8000/ws/agent/';
+    // Use VITE_API_WS_URL from environment, fallback to localhost for dev
+    const wsUrl = import.meta.env.VITE_API_WS_URL || 'ws://localhost:8000/ws/agent/';
     const wsUrlWithToken = `${wsUrl}?token=${session.access_token}`;
     const ws = new WebSocket(wsUrlWithToken);
 
