@@ -121,11 +121,18 @@ export function AgentCanvas() {
     layoutGraph(graphState)
       .then((layout) => {
         console.log('🎨 Rendering layout:', layout.nodes.length, 'nodes,', layout.edges.length, 'edges');
-        renderLayout(editor, layout.nodes, layout.edges);
-        setStatus('idle');
-        setSaveStatus('unsaved');
-        if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
-        autoSaveTimerRef.current = window.setTimeout(() => syncCanvas(), 3000);
+        
+        // Wrap renderLayout in try-catch to prevent React crashes
+        try {
+          renderLayout(editor, layout.nodes, layout.edges);
+          setStatus('idle');
+          setSaveStatus('unsaved');
+          if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
+          autoSaveTimerRef.current = window.setTimeout(() => syncCanvas(), 3000);
+        } catch (renderError) {
+          console.error('❌ Render layout error:', renderError);
+          setStatus('error');
+        }
       })
       .catch((err) => {
         console.error('Layout error:', err);
