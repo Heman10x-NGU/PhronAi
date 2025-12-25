@@ -20,7 +20,20 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "dev-secret-key-change-in-production
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "True").lower() == "true"
 
+# Allow all hosts in production (Render/Vercel domains)
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+# Add wildcard support for deployment platforms
+if not DEBUG:
+    ALLOWED_HOSTS.extend(["*.onrender.com", "*.vercel.app", ".onrender.com", ".vercel.app"])
+
+# CORS settings for WebSocket connections from frontend
+CORS_ALLOW_ALL_ORIGINS = True  # For demo purposes
+CSRF_TRUSTED_ORIGINS = [
+    "https://*.vercel.app",
+    "https://*.onrender.com",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
 
 # Application definition
 INSTALLED_APPS = [
