@@ -309,7 +309,11 @@ export function AgentCanvas() {
 
       {/* CANVAS - Full height minus header */}
       <div className="flex-1 relative z-0">
-        <Tldraw onMount={setEditor} shapeUtils={customShapeUtils} />
+        <Tldraw 
+          onMount={setEditor} 
+          shapeUtils={customShapeUtils}
+          licenseKey={import.meta.env.VITE_TLDRAW_LICENSE_KEY || undefined}
+        />
       </div>
 
       {/* Transcript Modal */}
