@@ -75,12 +75,26 @@ export function Login() {
 
       <div className="relative glass rounded-2xl p-8 max-w-md w-full glow animate-fade-in">
         {/* Logo & Header */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-6">
           <h1 className="text-4xl font-bold gradient-text mb-2">PHRONAI</h1>
           <p className="text-[var(--phronai-text-muted)]">
-            Operational Intelligence Agent
+            Voice-Powered AI Diagramming
           </p>
         </div>
+
+        {/* App Summary */}
+        <div className="mb-6 p-4 bg-[var(--phronai-surface)]/50 rounded-xl border border-[var(--phronai-surface-light)]">
+          <p className="text-sm text-[var(--phronai-text)] mb-3">
+            🎤 Speak naturally and watch your ideas transform into professional diagrams in real-time.
+          </p>
+          <div className="text-xs text-[var(--phronai-text-muted)] space-y-1">
+            <p className="font-medium text-[var(--phronai-secondary)]">Try saying:</p>
+            <p>• "Create a microservices architecture for Uber"</p>
+            <p>• "Add a database connected to the API server"</p>
+            <p>• "Design a payment flow with Stripe integration"</p>
+          </div>
+        </div>
+
 
         {/* Mode Toggle */}
         <div className="flex gap-2 mb-6 p-1 bg-[var(--phronai-surface)] rounded-lg">
@@ -249,8 +263,20 @@ export function Login() {
 
         {/* Footer */}
         <p className="text-center text-xs text-[var(--phronai-text-muted)] mt-6">
-          Voice-powered diagram creation with zero hallucinations.
+          ✓ Zero hallucinations — AI output is always schema-validated
         </p>
+
+        {/* Tech Stack */}
+        <div className="flex flex-wrap justify-center gap-2 mt-4">
+          {['Django', 'React', 'Groq LLaMA', 'Deepgram', 'Supabase'].map((tech) => (
+            <span
+              key={tech}
+              className="px-2 py-1 text-[10px] bg-[var(--phronai-surface)] text-[var(--phronai-text-muted)] rounded border border-[var(--phronai-surface-light)]"
+            >
+              {tech}
+            </span>
+          ))}
+        </div>
       </div>
     </div>
   );
