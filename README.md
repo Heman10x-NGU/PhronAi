@@ -181,15 +181,6 @@ phronai/
 
 ---
 
-## 🚢 Deployment
-
-### Railway (Recommended)
-
-1. Push to GitHub
-2. Connect repo at [railway.app](https://railway.app)
-3. Add PostgreSQL + Redis from marketplace
-4. Set environment variables
-5. Deploy!
 
 ### Environment Variables
 
