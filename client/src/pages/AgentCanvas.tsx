@@ -48,8 +48,11 @@ export function AgentCanvas() {
   useEffect(() => {
     if (!session?.access_token) return;
 
-    // Use VITE_API_WS_URL from environment, fallback to localhost for dev
-    const wsUrl = import.meta.env.VITE_WS_URL || 'ws://localhost:8000/ws/agent/';
+    // Determine WebSocket URL: env var > production auto-detect > localhost dev
+    const wsUrl = import.meta.env.VITE_WS_URL 
+      || (window.location.hostname !== 'localhost' 
+          ? 'wss://phronai-api.onrender.com/ws/agent/' 
+          : 'ws://localhost:8000/ws/agent/');
     const wsUrlWithToken = `${wsUrl}?token=${session.access_token}`;
     const ws = new WebSocket(wsUrlWithToken);
 
