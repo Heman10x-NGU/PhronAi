@@ -42,13 +42,14 @@ export function AgentCanvas() {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const autoSaveTimerRef = useRef<number | null>(null);
+  const handleActionsRef = useRef<(actions: SketchResponse['actions']) => void>(() => {});
 
   // WebSocket connection
   useEffect(() => {
     if (!session?.access_token) return;
 
     // Use VITE_API_WS_URL from environment, fallback to localhost for dev
-    const wsUrl = import.meta.env.VITE_API_WS_URL || 'ws://localhost:8000/ws/agent/';
+    const wsUrl = import.meta.env.VITE_WS_URL || 'ws://localhost:8000/ws/agent/';
     const wsUrlWithToken = `${wsUrl}?token=${session.access_token}`;
     const ws = new WebSocket(wsUrlWithToken);
 
@@ -70,7 +71,7 @@ export function AgentCanvas() {
             setStatus('reasoning');
             break;
           case 'actions':
-            handleActions(data.actions);
+            handleActionsRef.current(data.actions);
             break;
           case 'error':
             console.error('Server error:', data.message);
@@ -139,6 +140,11 @@ export function AgentCanvas() {
         setStatus('error');
       });
   }, [editor]);
+
+  // Keep the ref always pointing to the latest handleActions (avoids stale closure)
+  useEffect(() => {
+    handleActionsRef.current = handleActions;
+  }, [handleActions]);
 
   const syncCanvas = useCallback(() => {
     if (!editor || !wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) return;
