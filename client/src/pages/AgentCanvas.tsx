@@ -44,9 +44,10 @@ export function AgentCanvas() {
   const autoSaveTimerRef = useRef<number | null>(null);
   const handleActionsRef = useRef<(actions: SketchResponse['actions']) => void>(() => {});
 
-  // WebSocket connection
+  // WebSocket connection - depend on access_token string, not session object reference
+  const accessToken = session?.access_token;
   useEffect(() => {
-    if (!session?.access_token) return;
+    if (!accessToken) return;
 
     let cleaned = false; // Prevent stale callbacks after cleanup
 
@@ -55,7 +56,7 @@ export function AgentCanvas() {
       || (window.location.hostname !== 'localhost' 
           ? 'wss://phronai-api.onrender.com/ws/agent/' 
           : 'ws://localhost:8000/ws/agent/');
-    const wsUrlWithToken = `${wsUrl}?token=${session.access_token}`;
+    const wsUrlWithToken = `${wsUrl}?token=${accessToken}`;
     const ws = new WebSocket(wsUrlWithToken);
 
     ws.onopen = () => {
@@ -101,8 +102,9 @@ export function AgentCanvas() {
       setStatus('error');
     };
 
-    ws.onclose = () => {
+    ws.onclose = (event) => {
       if (cleaned) return;
+      console.log('🔌 WebSocket closed:', event.code, event.reason);
       setIsConnected(false);
     };
 
@@ -111,7 +113,7 @@ export function AgentCanvas() {
       cleaned = true;
       ws.close();
     };
-  }, [session]);
+  }, [accessToken]);
 
   const handleActions = useCallback((actions: SketchResponse['actions']) => {
     if (!editor || actions.length === 0) {
