@@ -48,6 +48,8 @@ export function AgentCanvas() {
   useEffect(() => {
     if (!session?.access_token) return;
 
+    let cleaned = false; // Prevent stale callbacks after cleanup
+
     // Determine WebSocket URL: env var > production auto-detect > localhost dev
     const wsUrl = import.meta.env.VITE_WS_URL 
       || (window.location.hostname !== 'localhost' 
@@ -57,12 +59,14 @@ export function AgentCanvas() {
     const ws = new WebSocket(wsUrlWithToken);
 
     ws.onopen = () => {
+      if (cleaned) return;
       console.log('Connected to PHRONAI');
       setIsConnected(true);
       setStatus('idle');
     };
 
     ws.onmessage = (event) => {
+      if (cleaned) return;
       try {
         const data = JSON.parse(event.data);
         switch (data.type) {
@@ -91,15 +95,22 @@ export function AgentCanvas() {
     };
 
     ws.onerror = (err) => {
+      if (cleaned) return;
       console.warn('⚠️ WebSocket error - Backend running?', err);
       setIsConnected(false);
       setStatus('error');
     };
 
-    ws.onclose = () => setIsConnected(false);
+    ws.onclose = () => {
+      if (cleaned) return;
+      setIsConnected(false);
+    };
 
     wsRef.current = ws;
-    return () => ws.close();
+    return () => {
+      cleaned = true;
+      ws.close();
+    };
   }, [session]);
 
   const handleActions = useCallback((actions: SketchResponse['actions']) => {
