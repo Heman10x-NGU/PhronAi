@@ -241,3 +241,9 @@ REDIS_URL=redis://...
 ## 📄 License
 
 MIT License - See [LICENSE](LICENSE) for details.
+
+## Demo
+
+Watch the demo: [YouTube](https://youtube.com)
+
+Built with Groq LLaMA 3.3 for fast inference and Deepgram for speech-to-text.
